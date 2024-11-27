@@ -189,12 +189,17 @@ def main():
 
     if st.button("Extract"):
         if uploaded_file is not None:
-            tables_json = extract_tables(uploaded_file.name)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(uploaded_file.read())
+                tmp_file_path = tmp_file.name
+
+            tables_json = extract_tables(tmp_file_path)
             if tables_json:
-                st.header("Transaction Details : ")
+                st.header("Transaction Details:")
                 tabular_data = extract_tabular_data(tables_json)
                 for idx, df in enumerate(tabular_data, start=1):
                     st.write(df)
+
                     
     if st.button("Extract as JSON"):
         if uploaded_file is not None:

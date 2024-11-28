@@ -206,8 +206,10 @@ def main():
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
                 tmp_file.write(uploaded_file.read())
                 tmp_file_path = tmp_file.name
-
-            images = convert_from_path(tmp_file_path)
+                
+            # Set the path to Poppler's utilities
+            POPPLER_PATH = "/usr/bin"
+            images = convert_from_path(tmp_file_path, poppler_path=POPPLER_PATH)
             text_with_pytesseract = extract_text_with_pytesseract(images)
             text = " ".join(text_with_pytesseract)
             json_output = parse_bank_statement(text)

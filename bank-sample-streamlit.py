@@ -203,45 +203,45 @@ def main():
 
                     
     if st.button("Extract as JSON"):
-    if uploaded_file is not None:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            tmp_file.write(uploaded_file.read())
-            tmp_file_path = tmp_file.name
-
-        # Debugging step to check if `pdfinfo` is available
-        try:
-            result = subprocess.run(["which", "pdfinfo"], capture_output=True, text=True)
-            pdfinfo_path = result.stdout.strip()
-            if pdfinfo_path:
-                st.write(f"`pdfinfo` located at: {pdfinfo_path}")
-                POPPLER_PATH = pdfinfo_path  # Use the located path
-            else:
-                st.error("`pdfinfo` is not found. Ensure `poppler-utils` is installed correctly.")
-                return  # Exit this section if `pdfinfo` is not available
-        except Exception as e:
-            st.error(f"Error locating `pdfinfo`: {e}")
-            return  # Exit this section if an error occurs
-
-        # Convert PDF to images using pdf2image
-        try:
-            images = convert_from_path(tmp_file_path, poppler_path=POPPLER_PATH)
-            text_with_pytesseract = extract_text_with_pytesseract(images)
-            text = " ".join(text_with_pytesseract)
-            json_output = parse_bank_statement(text)
-            json_str = json.dumps(json_output, indent=4)
-
-            st.header("Extracted JSON")
-            st.json(json_output)
-
-            # Provide a download button for the JSON file
-            st.download_button(
-                label="Download JSON",
-                data=json_str,
-                file_name="bank_statement.json",
-                mime="application/json"
-            )
-        except Exception as e:
-            st.error(f"Error converting PDF to images or processing: {e}")
+        if uploaded_file is not None:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(uploaded_file.read())
+                tmp_file_path = tmp_file.name
+    
+            # Debugging step to check if `pdfinfo` is available
+            try:
+                result = subprocess.run(["which", "pdfinfo"], capture_output=True, text=True)
+                pdfinfo_path = result.stdout.strip()
+                if pdfinfo_path:
+                    st.write(f"`pdfinfo` located at: {pdfinfo_path}")
+                    POPPLER_PATH = pdfinfo_path  # Use the located path
+                else:
+                    st.error("`pdfinfo` is not found. Ensure `poppler-utils` is installed correctly.")
+                    return  # Exit this section if `pdfinfo` is not available
+            except Exception as e:
+                st.error(f"Error locating `pdfinfo`: {e}")
+                return  # Exit this section if an error occurs
+    
+            # Convert PDF to images using pdf2image
+            try:
+                images = convert_from_path(tmp_file_path, poppler_path=POPPLER_PATH)
+                text_with_pytesseract = extract_text_with_pytesseract(images)
+                text = " ".join(text_with_pytesseract)
+                json_output = parse_bank_statement(text)
+                json_str = json.dumps(json_output, indent=4)
+    
+                st.header("Extracted JSON")
+                st.json(json_output)
+    
+                # Provide a download button for the JSON file
+                st.download_button(
+                    label="Download JSON",
+                    data=json_str,
+                    file_name="bank_statement.json",
+                    mime="application/json"
+                )
+            except Exception as e:
+                st.error(f"Error converting PDF to images or processing: {e}")
 
 
 if __name__ == "__main__":
